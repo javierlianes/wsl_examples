@@ -1,0 +1,16 @@
+spring:
+  kafka:
+    properties:
+      "acks": "all"
+      "auto.create.topics.enable": "true"
+    bootstrap-servers: ${WSL_KAFKA_IP:localhost}:9092
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+server:
+  port: 8081
