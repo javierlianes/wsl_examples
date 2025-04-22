@@ -3,12 +3,23 @@
 ## Spring Boot Kafka Microservice (wslkafka)
 
 This is a simple Spring Boot microservice application that demonstrates how to produce and consume messages to/from Kafka. 
-It uses Docker to run Kafka and connects to it through the application.
+It uses Docker to run Kafka and connects to it through the application. We also collect the message we send from a 
+Postgres database also located in a WSL Docker
+
+In this exercise we see:
+
+- Java
+- Spring Boot
+- Kafka
+- Postgres
+- Docker
+- Windows Subsystem for Linux
 
 ### Features
 
 - **Producer**: Sends messages to a Kafka topic (`demo-topic`) via a REST endpoint.
 - **Consumer**: Listens to messages from Kafka and processes them.
+- **MessageRepository**: Fetching data from Postgres
 
 ### Prerequisites
 
@@ -16,10 +27,10 @@ Before running this project, ensure you have the following installed:
 
 - Java 11 or higher
 - Maven
-- Docker (for Kafka)
+- Docker (for Kafka and Postgres)
 - WSL (Windows Subsystem for Linux) if using Windows
 
-### Kafka Setup with Docker
+### Kafka, Zookeeper and Postgres Setup with Docker
 
 To run Kafka in Docker (via WSL or directly), you can use the following `docker-compose.yml` setup.
 
@@ -48,6 +59,21 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: mensajesdb
+      POSTGRES_USER: <WSL_USER>
+      POSTGRES_PASSWORD: <WSL_PASS>
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+volumes:
+  postgres-data:
 ```
 ### Important commands
 
@@ -75,7 +101,19 @@ or in real time
 ```bash
 kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo-topic
 ```
-#### 4. Start Kafka and Zookeeper with Docker Compose
+#### 4. Access Postgres container
+
+```bash
+docker exec -it postgres bash
+```
+
+#### 5. Enter into database
+
+```sql
+psql -U useruser -d mensajesdb
+```
+
+#### 6. Start Kafka, Zookeeper and Postgres with Docker Compose
 
 ```bash
 docker-compose up -d
